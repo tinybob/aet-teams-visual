@@ -5,9 +5,9 @@
  */
 const msalConfig = {
     auth: {
-        clientId: "Enter_the_Application_Id_Here",
-        authority: "Enter_the_Cloud_Instance_Id_HereEnter_the_Tenant_Info_Here",
-        redirectUri: "Enter_the_Redirect_Uri_Here",
+        clientId: "3300c25f-0b50-445e-9a25-19d359810846",
+        authority: "https://login.microsoftonline.com/93f33571-550f-43cf-b09f-cd331338d086/",
+        redirectUri: "https://aet-teams-visual.azurewebsites.net/auth",
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored

@@ -16,8 +16,11 @@ app.use(morgan('dev'));
 // Setup app folders.
 app.use(express.static('app'));
 
+
+
 // Set up a route for index.html
 app.get('*', (req, res) => {
+    console.log('content received');
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 

@@ -33,6 +33,8 @@ function handleResponse(response) {
     if (response !== null) {
         username = response.account.username;
         showWelcomeMessage(username);
+
+
     } else {
         selectAccount();
     }
@@ -95,6 +97,21 @@ function getTokenPopup(request) {
 }
 
 function seeProfile() {
+    if(localStorage.length) {
+        for (let index = 0; index < localStorage.length; index ++) {
+            key = localStorage.key(index);
+            value = localStorage.getItem(key);
+            console.log(`key: ${key}, value: ${value}`)
+        }
+    }
+
+    if(sessionStorage.length) {
+        for (let index = 0; index < sessionStorage.length; index ++) {
+            key = sessionStorage.key(index);
+            value = sessionStorage.getItem(key);
+            console.log(`key: ${key}, value: ${value}`)
+        }
+    }
     getTokenPopup(loginRequest)
         .then(response => {
             callMSGraph(graphConfig.graphMeEndpoint, response.accessToken, updateUI);
