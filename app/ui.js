@@ -40,6 +40,7 @@ function updateUI(data, endpoint) {
             const tabContent = document.getElementById("nav-tabContent");
             const tabList = document.getElementById("list-tab");
             tabList.innerHTML = ''; // clear tabList at each readMail call
+            tabContent.innerHTML = '';
 
             data.value.map((d, i) => {
                 // Keeping it simple
@@ -64,5 +65,127 @@ function updateUI(data, endpoint) {
                 }
             });
         }
+    } else if(endpoint.indexOf('people') > 0) {
+        const tabContent = document.getElementById("nav-tabContent");
+        const tabList = document.getElementById("list-tab");
+        tabList.innerHTML = ''; 
+        tabContent.innerHTML = '';
+
+        data.value.map((d, i) => {
+            const listItem = document.createElement("a");
+            listItem.setAttribute("class", "list-group-item list-group-item-action")
+            listItem.setAttribute("id", "list" + i + "list")
+            listItem.setAttribute("data-toggle", "list")
+            listItem.setAttribute("href", "#list" + i)
+            listItem.setAttribute("role", "tab")
+            listItem.setAttribute("aria-controls", i)
+            listItem.innerHTML = d.displayName;
+            tabList.appendChild(listItem)
+
+            const contentItem = document.createElement("div");
+            contentItem.setAttribute("class", "tab-pane fade")
+            contentItem.setAttribute("id", "list" + i)
+            contentItem.setAttribute("role", "tabpanel")
+            contentItem.setAttribute("aria-labelledby", "list" + i + "list")
+            contentItem.innerHTML = "<strong> Relevance score: " + d.scoredEmailAddresses[0].relevanceScore + "</strong><br><br>" +
+                "<strong> Department: " + d.department + " </strong><br><br>" + 
+                "<strong> Email: " + d.scoredEmailAddresses[0].address + " </strong><br><br>" +
+                "<strong> Person type: " + d.personType.subclass + " </strong><br><br>"
+            tabContent.appendChild(contentItem);
+        });
+    } else if(endpoint.indexOf('joinedTeams') > 0) {
+        const tabContent = document.getElementById("nav-tabContent");
+        const tabList = document.getElementById("list-tab");
+        tabList.innerHTML = ''; 
+        tabContent.innerHTML = '';
+
+        data.value.map((d, i) => {
+            // const listItem = document.createElement('div');
+            // listItem.setAttribute("class", "list-group-item list-group-item-action")
+            // listItem.setAttribute("id", d.id)
+            // listItem.setAttribute("role", "tab")
+            // listItem.setAttribute("aria-controls", i)
+            // listItem.innerHTML = d.displayName;
+            
+            // const itemDetails = document.createElement('div');
+            // itemDetails.innerHTML = d.description + 
+            //     `<button onclick="getEvents('${d.id}')">events</button>` + 
+            //     `<button onclick="getChannels('${d.id}')">channels</button>`
+
+            const listItem = document.createElement("div");
+            listItem.setAttribute("class", "card text-center")
+            listItem.setAttribute("id", d.id)
+            listItem.setAttribute("aria-labelledby", "list" + i + "list")
+            const itemDetails = document.createElement("div");
+            itemDetails.setAttribute("class", "card-body");
+            itemDetails.setAttribute("style", "overflow: hidden");
+            itemDetails.innerHTML = `<h5 class="card-title">${d.displayName}</h5><br><br>` +
+                "<small>" + d.description + "</small><br><br>" + 
+                `<button onclick="getEvents('${d.id}')">events</button>` + 
+                `<button onclick="getChannels('${d.id}')">channels</button>`;
+
+            listItem.appendChild(itemDetails)
+            tabList.appendChild(listItem)
+        })
+    } else if(endpoint.indexOf('events') > 0) {
+        const tabContent = document.getElementById("nav-tabContent");
+        tabContent.innerHTML = '';
+
+        data.value.map((d, i) => {
+            const contentItem = document.createElement("div");
+            contentItem.setAttribute("class", "card text-center")
+            contentItem.setAttribute("id", "list" + i)
+            contentItem.setAttribute("aria-labelledby", "list" + i + "list")
+            const body = document.createElement("div");
+            body.setAttribute("class", "card-body");
+            body.setAttribute("style", "overflow: hidden");
+            body.innerHTML = `<h5 class="card-title">${d.subject}</h5><br><br>` +
+                "<small> Start: " + d.start.timeZone + " " + d.start.dateTime + " </small><br><br>" + 
+                "<small> End: " + d.end.timeZone + " " + d.end.dateTime + " </small><br><br>" +
+                "" + d.body.content + " <br><br>";
+            contentItem.appendChild(body);
+            tabContent.appendChild(contentItem);
+        });
+    } else if(endpoint.indexOf('channels') > 0 && endpoint.indexOf('messages') <0) {
+        const teamId = data['@odata.context'].split(/'/)[1];
+        const tabContent = document.getElementById(teamId);
+
+        const channelList = document.getElementsByClassName('channel-list');
+        const listLength = channelList.length;
+        for(let i = 0; i < listLength; i++) {
+            channelList[0].remove();
+        }
+  
+        data.value.map((d, i) => {
+            const channel = document.createElement("div");
+            channel.setAttribute("class", "list-group-item list-group-item-action channel-list");
+            channel.setAttribute("style", "overflow: hidden");
+            channel.setAttribute("onclick", "getPosts('" + d.id + "', '" + teamId + "')")
+            channel.innerHTML =  "<strong> " + d.displayName + " </strong><br><br>"
+            // "<small> " + d.description + " </small>";
+
+            tabContent.appendChild(channel);
+
+        });
+
+    } else if(endpoint.indexOf('messages') > 0) {
+        const tabContent = document.getElementById("nav-tabContent");
+        tabContent.innerHTML = '';
+
+        data.value.map((d, i) => {
+            const contentItem = document.createElement("div");
+            contentItem.setAttribute("class", "card text-center")
+            contentItem.setAttribute("id", "list" + i)
+            contentItem.setAttribute("aria-labelledby", "list" + i + "list")
+            const body = document.createElement("div");
+            body.setAttribute("class", "card-body");
+            body.setAttribute("style", "overflow: hidden");
+            body.innerHTML = `` +
+                "<small> Created: " + d.createdDateTime + " </small><br><br>" + 
+                "<small> Last modified: " + d.lastModifiedDateTime + " </small><br><br>" +
+                "" + d.body.content + " <br><br>";
+            contentItem.appendChild(body);
+            tabContent.appendChild(contentItem);
+        });
     }
 }

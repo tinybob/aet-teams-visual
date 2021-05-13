@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Microsoft identity platform</title>
+    <title>Microsoft graph platform</title>
     <link rel="SHORTCUT ICON" href="./favicon.svg" type="image/x-icon">
-    
+
     <!-- msal.min.js can be used in the place of msal.js; included msal.js to make debug easy -->
-    <script src="https://alcdn.msauth.net/browser/2.7.0/js/msal-browser.js" integrity="sha384-5Fqyq1ncNYhL2mXCdWAFXkf2wWtKeA0mXYp++ryAX1lowD0ctAHFdity37L/ULXh" crossorigin="anonymous"></script>
+    <script src="https://alcdn.msauth.net/browser/2.13.1/js/msal-browser.js" crossorigin="anonymous"></script>
 
     <!-- To help ensure reliability, Microsoft provides a second CDN -->
     <script type="text/javascript">
-      if(typeof Msal === 'undefined')document.write(unescape("%3Cscript src='https://alcdn.msftauth.net/browser/2.7.0/js/msal-browser.js' type='text/javascript' crossorigin='anonymous' %3E%3C/script%3E"));
+      if(typeof Msal === 'undefined')document.write(unescape("%3Cscript src='https://alcdn.msftauth.net/browser/2.13.1/js/msal-browser.js' type='text/javascript' crossorigin='anonymous' %3E%3C/script%3E"));
     </script>
 
     <!-- adding Bootstrap 4 for UI components  -->
@@ -20,7 +20,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="/">Microsoft identity platform</a>
+      <a class="navbar-brand" href="/">Microsoft Graph Platform</a>
       <div class="btn-group ml-auto dropleft">
           <button type="button" id="SignIn" class="btn btn-secondary" onclick="signIn()">
             Sign In
@@ -28,7 +28,7 @@
       </div>
     </nav>
     <br>
-    <h5 class="card-header text-center">Vanilla JavaScript SPA calling MS Graph API with MSAL.js</h5>
+    <h5 class="card-header text-center">A prototype JavaScript SPA calling MS Graph API with MSAL.js</h5>
     <br>
     <div class="row" style="margin:auto" >
     <div id="card-div" class="col-md-3" style="display:none">
@@ -42,6 +42,12 @@
         <br>
         <br>
         <button class="btn btn-primary" id="readMail" onclick="readMail()">Read Mails</button>
+        <br>
+        <br>
+        <button class="btn btn-primary" id="getPerson" onclick="getPerson()">Get Person</button>
+        <br>
+        <br>
+        <button class="btn btn-primary" id="getTeams" onclick="getTeams()">Get Teams</button>
       </div>
     </div>
     </div>
