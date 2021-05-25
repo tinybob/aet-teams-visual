@@ -187,5 +187,27 @@ function updateUI(data, endpoint) {
             contentItem.appendChild(body);
             tabContent.appendChild(contentItem);
         });
+    } else if(endpoint.indexOf('search_result') >= 0) {
+        const modal = document.getElementById('search-modal');
+        if(data.length == 0) {
+            modal.innerHTML = 'No search result...'
+            return ;
+        }
+        modal.innerHTML = '';
+
+        data.map((d, i) => {
+            const item = document.createElement("div");
+            item.setAttribute("class", "list-group-item list-group-item-action channel-list");
+            item.setAttribute("style", "overflow: hidden");
+            if(d.start) {
+                item.setAttribute("style", "background-color: aquamarine")
+            }
+            
+            // item.setAttribute("onclick", "getPosts('" + d.id + "', '" + teamId + "')")
+            item.innerHTML =  "<strong> " + d.body.content + " </strong><br><br>"
+            // "<small> " + d.description + " </small>";
+
+            modal.appendChild(item);
+        });
     }
 }

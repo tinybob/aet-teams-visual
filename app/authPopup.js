@@ -195,7 +195,8 @@ function getGuild() {
 function getEvents(groupId) {
     getTokenPopup(teamsRequest)
         .then(response => {
-            const eventsEndpoint = graphConfig.graphBetaEndpoint + `/groups/${groupId}/events`;
+            const dateTime = getNowformatted();
+            const eventsEndpoint = graphConfig.graphBetaEndpoint + `/groups/${groupId}/events?$top=100&$select=subject,body,id,start,end&$filter=start/dateTime ge '${dateTime}'`;
             callMSGraph(eventsEndpoint, response.accessToken, updateUI, true);
         }).catch( error => {
             console.error(error);
@@ -206,7 +207,7 @@ function getEvents(groupId) {
 function getChannels(groupId) {
     getTokenPopup(teamsRequest)
         .then(response => {
-            const channelEndpoint = graphConfig.graphBetaEndpoint + `/teams/${groupId}/channels`;
+            const channelEndpoint = graphConfig.graphBetaEndpoint + `/teams/${groupId}/channels?$select=id,displayName`;
             callMSGraph(channelEndpoint, response.accessToken, updateUI, true);
         }).catch( error => {
             console.error(error);
@@ -217,13 +218,42 @@ function getChannels(groupId) {
 function getPosts(channelId, groupId) {
     getTokenPopup(teamsRequest)
         .then(response => {
-            const endpoint = graphConfig.graphBetaEndpoint + `/teams/${groupId}/channels/${channelId}/messages`;
+            const endpoint = graphConfig.graphBetaEndpoint + `/teams/${groupId}/channels/${channelId}/messages?$top=100`;
             callMSGraph(endpoint, response.accessToken, updateUI);
         }).catch( error => {
             console.error(error);
         })
 }
 
+function search() {
+    const term = document.getElementById('search-term').value.toLowerCase();
+    let result = [];
+    for(let i = 0; i < sessionStorage.length; i++) {
+        if(sessionStorage.key(i).indexOf('graph.microsoft.com') > 0) {
+            const value = sessionStorage.getItem(sessionStorage.key(i));
+            const collection = JSON.parse(value);
+            for (const item of collection) {
+                if (item.body.content) {
+                    if(item.body.content.toLowerCase().indexOf(term) > 0) {
+                        result = result.concat(item);
+                    }
+                }    
+                
+            }
+            
+        }
+    }
+
+    updateUI(result, 'search_result');
+}
+
 selectAccount();
+
+function getNowformatted() {
+    const date = new Date();
+    const month = date.getMonth() + 1 > 9 ? date.getMonth() + 1 : `0${date.getMonth() + 1}`;
+    const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
+    return `${date.getFullYear()}-${month}-${day}T00:00:00`;
+}
 
 // export {signIn, signOut, seeProfile, readMail, getPerson, getTeams}

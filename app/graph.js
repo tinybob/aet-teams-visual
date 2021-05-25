@@ -23,6 +23,7 @@ function callMSGraph(endpoint, token, callback, isFetchingAll) {
                 const content = await fetchNext(response['@odata.nextLink'], options);
                 response.value = response.value.concat(content.value);
             }
+            cacheData(endpoint, response);
             return response;
         })
         .then(response => callback(response, endpoint))
@@ -40,4 +41,16 @@ async function fetchNext(endpoint, options) {
 
             return response;
         })
+}
+
+function cacheData(endpoint, data) {
+    // let events = sessionStorage.getItem('teams_event');
+    // let messages = sessionStorage.getItem('teams_message');
+    if((endpoint.indexOf('events') < 0 && endpoint.indexOf('messages') < 0)
+        || sessionStorage.getItem(endpoint) || data.value.length == 0)
+        return;
+    // if(sessionStorage.getItem(endpoint))
+    //     return;
+    const value = JSON.stringify(data.value);
+    sessionStorage.setItem(endpoint, value);
 }
