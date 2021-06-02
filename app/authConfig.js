@@ -62,3 +62,8 @@ const teamsRequest = {
     scopes: ["User.Read", "Group.ReadWrite.All"],
     forceRefresh: false // Set this to "true" to skip a cached token and go to the server to get a new token
 };
+
+const calendarRequest = {
+    scopes: ["Calendars.ReadWrite"],
+    forceRefresh: false
+}

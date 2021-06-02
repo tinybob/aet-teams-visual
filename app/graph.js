@@ -1,4 +1,3 @@
-
 /** 
  * Helper function to call MS Graph API endpoint
  * using the authorization bearer token scheme
@@ -30,6 +29,32 @@ function callMSGraph(endpoint, token, callback, isFetchingAll) {
         .catch(error => console.log(error));
 }
 
+function postMSGraph(endpoint, token, body, callback) {
+    const headers = new Headers();
+    const bearer = `Bearer ${token}`;
+
+    headers.append("Authorization", bearer);
+    headers.append("Content-Type", "application/json");
+
+    const options = {
+        method: "POST",
+        headers: headers,
+        body: body
+    };
+
+    console.log('request made to Graph API at: ' + new Date().toString());
+
+    fetch(endpoint, options)
+        .then(response => {
+            if(response.ok && response.statusText == 'No Content')
+                return 'ok';
+            else 
+                return response.json();
+        })
+        .then(response => callback(response, endpoint))
+        .catch(error => console.log(error));
+}
+
 async function fetchNext(endpoint, options) {
     return fetch(endpoint, options)
         .then(response => response.json())
@@ -49,8 +74,7 @@ function cacheData(endpoint, data) {
     if((endpoint.indexOf('events') < 0 && endpoint.indexOf('messages') < 0)
         || sessionStorage.getItem(endpoint) || data.value.length == 0)
         return;
-    // if(sessionStorage.getItem(endpoint))
-    //     return;
+
     const value = JSON.stringify(data.value);
     sessionStorage.setItem(endpoint, value);
 }

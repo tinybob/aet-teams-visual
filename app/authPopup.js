@@ -182,14 +182,42 @@ function getTeams() {
 }
 
 function getGuild() {
+    const target = {
+        'value': 
+        [
+            {
+                'id': '529043f5-a154-4efa-96a2-8a49dedbe5db',
+                'displayName': 'Architecture Guild',
+                'description': 'Architecture Guild to increase knowledge sharing, professional learning and IP development.'
+            }, 
+            {
+                'id': '99298122-9a85-4d85-9e34-ecef7b8c49af',
+                'displayName': 'Guilds @ DXC',
+                'description': 'Guilds @ DXC'
+            },
+            {
+                'id': 'dd651bdf-b660-43e6-af20-59a1a318c015',
+                'displayName': 'Technology Guilds@DXC',
+                'description': 'This team is for developers to interact and learn programming languages by collaborating together. Created by EDGE Engineering Global SMEs Team.'
+            }
+        ]
+    };
     getTokenPopup(teamsRequest)
         .then(response => {
-            const target = ['']
-            let guilds = [];
-            
+            const endpoint = graphConfig.graphMeEndpoint + `/joinedTeams`;
+            callMSGraph(endpoint, response.accessToken, (data, ep) => {
+                for (const guild of target.value) {
+                    if(data.value.find(d => d.id === guild.id))
+                        guild.isMember = true;
+                }
+                updateUI(target, 'guilds');
+            }, true);
         }).catch( error => {
             console.error(error);
         })
+
+    // updateUI(target, 'guilds');
+
 }
 
 function getEvents(groupId) {
@@ -223,6 +251,60 @@ function getPosts(channelId, groupId) {
         }).catch( error => {
             console.error(error);
         })
+}
+
+function addToGroup(group) {
+    getTokenPopup(teamsRequest) 
+        .then(response => {
+            callMSGraph(graphConfig.graphMeEndpoint, response.accessToken, (data) => {
+                const endpoint = graphConfig.graphEndpoint + `/groups/${group}/members/$ref`;
+                const body = {
+                    "@odata.id": `https://graph.microsoft.com/v1.0/directoryObjects/${data.id}`
+                }
+                postMSGraph(endpoint, response.accessToken, JSON.stringify(body), (data) => {
+                    if(data == 'ok') {
+                        getGuild();
+                    }
+                });
+            });
+        }).catch( error => {
+            console.error(error);
+        })
+
+}
+
+function addToCalendar(event) {
+    getTokenPopup(calendarRequest)
+        .then(response => {
+            const endpoint = graphConfig.graphMeEndpoint + `/calendar/events`;
+            
+            let body = getFromCache(event);
+            body.attendees = [];
+            
+            postMSGraph(endpoint, response.accessToken, JSON.stringify(body), (data) => {
+                if(data) {
+                    alert(`${body.subject}\n\n This event has been successfully added to your calendar`);
+                }
+            });
+        }).catch( error => {
+            console.error(error);
+        })
+}
+
+function getFromCache(id) {
+
+    for(let i = 0; i < sessionStorage.length; i++) {
+        if(sessionStorage.key(i).indexOf('graph.microsoft.com') > 0) {
+            const value = sessionStorage.getItem(sessionStorage.key(i));
+            const collection = JSON.parse(value);
+            for (const item of collection) {
+                if (item.id == id)
+                    return item;
+            }
+        }
+        
+    }
+    return;
 }
 
 function search() {

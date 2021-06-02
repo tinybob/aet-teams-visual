@@ -93,7 +93,7 @@ function updateUI(data, endpoint) {
                 "<strong> Person type: " + d.personType.subclass + " </strong><br><br>"
             tabContent.appendChild(contentItem);
         });
-    } else if(endpoint.indexOf('joinedTeams') > 0) {
+    } else if(endpoint.indexOf('joinedTeams') >= 0 || endpoint.indexOf('guilds') >= 0) {
         const tabContent = document.getElementById("nav-tabContent");
         const tabList = document.getElementById("list-tab");
         tabList.innerHTML = ''; 
@@ -120,17 +120,22 @@ function updateUI(data, endpoint) {
             itemDetails.setAttribute("class", "card-body");
             itemDetails.setAttribute("style", "overflow: hidden");
             itemDetails.innerHTML = `<h5 class="card-title">${d.displayName}</h5><br><br>` +
-                "<small>" + d.description + "</small><br><br>" + 
-                `<button onclick="getEvents('${d.id}')">events</button>` + 
+                "<small>" + d.description + "</small><br><br>";
+            if (d.isMember || endpoint.indexOf('joinedTeams') >= 0) {
+                itemDetails.innerHTML += `<button onclick="getEvents('${d.id}')">events</button>` + 
                 `<button onclick="getChannels('${d.id}')">channels</button>`;
-
+            } else {
+                itemDetails.innerHTML += `<button onclick="addToGroup('${d.id}')">join</button>`;
+            }
+                
+               
             listItem.appendChild(itemDetails)
             tabList.appendChild(listItem)
         })
     } else if(endpoint.indexOf('events') > 0) {
         const tabContent = document.getElementById("nav-tabContent");
         tabContent.innerHTML = '';
-
+        // const groupId = data['@odata.context'].split(/'/)[1];
         data.value.map((d, i) => {
             const contentItem = document.createElement("div");
             contentItem.setAttribute("class", "card text-center")
@@ -142,7 +147,8 @@ function updateUI(data, endpoint) {
             body.innerHTML = `<h5 class="card-title">${d.subject}</h5><br><br>` +
                 "<small> Start: " + d.start.timeZone + " " + d.start.dateTime + " </small><br><br>" + 
                 "<small> End: " + d.end.timeZone + " " + d.end.dateTime + " </small><br><br>" +
-                "" + d.body.content + " <br><br>";
+                "" + d.body.content + " <br><br>" + 
+                `<button onclick="addToCalendar('${d.id}')">Add to calendar</button>`;
             contentItem.appendChild(body);
             tabContent.appendChild(contentItem);
         });
@@ -194,7 +200,7 @@ function updateUI(data, endpoint) {
             return ;
         }
         modal.innerHTML = '';
-
+        modal.innerHTML = `<h5>Search result count: ${data.length}</h5>`
         data.map((d, i) => {
             const item = document.createElement("div");
             item.setAttribute("class", "list-group-item list-group-item-action channel-list");
@@ -209,5 +215,7 @@ function updateUI(data, endpoint) {
 
             modal.appendChild(item);
         });
+    // } else if(endpoint.indexOf('guilds') >= 0) {
+
     }
 }
