@@ -8,7 +8,7 @@ const msalConfig = {
         clientId: "3300c25f-0b50-445e-9a25-19d359810846",
         // authority: "https://login.microsoftonline.com/93f33571-550f-43cf-b09f-cd331338d086/",
         // redirectUri: "http://localhost:3000/auth"
-        redirectUri: "https://aet-teams-visual.azurewebsites.net/auth",
+        redirectUri: "https://aet-teams-visual.azurewebsites.net/auth"
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored

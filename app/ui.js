@@ -135,7 +135,7 @@ function updateUI(data, endpoint) {
     } else if(endpoint.indexOf('events') > 0) {
         const tabContent = document.getElementById("nav-tabContent");
         tabContent.innerHTML = '';
-        // const groupId = data['@odata.context'].split(/'/)[1];
+        const groupId = data['@odata.context'].split(/'/)[1];
         data.value.map((d, i) => {
             const contentItem = document.createElement("div");
             contentItem.setAttribute("class", "card text-center")
@@ -148,7 +148,7 @@ function updateUI(data, endpoint) {
                 "<small> Start: " + d.start.timeZone + " " + d.start.dateTime + " </small><br><br>" + 
                 "<small> End: " + d.end.timeZone + " " + d.end.dateTime + " </small><br><br>" +
                 "" + d.body.content + " <br><br>" + 
-                `<button onclick="addToCalendar('${d.id}')">Add to calendar</button>`;
+                `<button onclick="addToCalendar('${d.id}', '${groupId}')">Add to calendar</button>`;
             contentItem.appendChild(body);
             tabContent.appendChild(contentItem);
         });

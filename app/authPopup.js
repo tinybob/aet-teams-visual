@@ -224,7 +224,8 @@ function getEvents(groupId) {
     getTokenPopup(teamsRequest)
         .then(response => {
             const dateTime = getNowformatted();
-            const eventsEndpoint = graphConfig.graphBetaEndpoint + `/groups/${groupId}/events?$top=100&$select=subject,body,id,start,end&$filter=start/dateTime ge '${dateTime}'`;
+            const eventsEndpoint = graphConfig.graphBetaEndpoint + `/groups/${groupId}/events?$top=100&$select=subject,body,id,start,end,attendees`;
+            // const eventsEndpoint = graphConfig.graphBetaEndpoint + `/groups/${groupId}/events?$top=100&$select=subject,body,id,start,end,attendees&$filter=start/dateTime ge '${dateTime}'`;
             callMSGraph(eventsEndpoint, response.accessToken, updateUI, true);
         }).catch( error => {
             console.error(error);
@@ -273,19 +274,42 @@ function addToGroup(group) {
 
 }
 
-function addToCalendar(event) {
+function addToCalendar(event, group) {
     getTokenPopup(calendarRequest)
         .then(response => {
-            const endpoint = graphConfig.graphMeEndpoint + `/calendar/events`;
-            
-            let body = getFromCache(event);
-            body.attendees = [];
-            
-            postMSGraph(endpoint, response.accessToken, JSON.stringify(body), (data) => {
-                if(data) {
+            const currentAccount = myMSALObj.getAllAccounts()[0];
+            const attendee = {
+                "emailAddress": {
+                    "address": currentAccount.username,
+                    "name": currentAccount.name
+                },
+                "status": {
+                    "response": "Accepted",
+                    "time": `${getNowformatted()}Z`
+                },
+                "type": "optional"
+            };
+            let attendees = getFromCache(event).attendees;
+            attendees.push(attendee);
+            const body = {
+                "attendees": attendees
+            };
+
+            const endpoint = graphConfig.graphEndpoint + `/groups/${group}/calendar/events/${event}`
+            patchMSGraph(endpoint, response.accessToken, JSON.stringify(body), data => {
+                if(data) 
                     alert(`${body.subject}\n\n This event has been successfully added to your calendar`);
-                }
-            });
+            })
+            // const endpoint = graphConfig.graphMeEndpoint + `/calendar/events`;
+            
+            // let body = getFromCache(event);
+            // body.attendees = [];
+            
+            // postMSGraph(endpoint, response.accessToken, JSON.stringify(body), (data) => {
+            //     if(data) {
+            //         alert(`${body.subject}\n\n This event has been successfully added to your calendar`);
+            //     }
+            // });
         }).catch( error => {
             console.error(error);
         })
@@ -335,7 +359,11 @@ function getNowformatted() {
     const date = new Date();
     const month = date.getMonth() + 1 > 9 ? date.getMonth() + 1 : `0${date.getMonth() + 1}`;
     const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
-    return `${date.getFullYear()}-${month}-${day}T00:00:00`;
+
+    const hour = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
+    const minute = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
+    const second = date.getSeconds() > 9 ? date.getSeconds() : `0${date.getSeconds()}`;
+    return `${date.getFullYear()}-${month}-${day}T${hour}:${minute}:${second}`;
 }
 
 // export {signIn, signOut, seeProfile, readMail, getPerson, getTeams}

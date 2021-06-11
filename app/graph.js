@@ -55,6 +55,32 @@ function postMSGraph(endpoint, token, body, callback) {
         .catch(error => console.log(error));
 }
 
+function patchMSGraph(endpoint, token, body, callback) {
+    const headers = new Headers();
+    const bearer = `Bearer ${token}`;
+
+    headers.append("Authorization", bearer);
+    headers.append("Content-Type", "application/json");
+
+    const options = {
+        method: "PATCH",
+        headers: headers,
+        body: body
+    };
+
+    console.log('request made to Graph API at: ' + new Date().toString());
+
+    fetch(endpoint, options)
+        .then(response => {
+            if(response.ok && response.statusText == 'No Content')
+                return 'ok';
+            else 
+                return response.json();
+        })
+        .then(response => callback(response, endpoint))
+        .catch(error => console.log(error));
+}
+
 async function fetchNext(endpoint, options) {
     return fetch(endpoint, options)
         .then(response => response.json())
